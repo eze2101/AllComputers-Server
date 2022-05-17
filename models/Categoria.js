@@ -7,8 +7,8 @@ const CategoriaSchema = Schema({
   },
   img: {
     type: String,
-    required: false,
-    unique: true,
+    required: true,
+    unique: false,
   },
 });
 

@@ -8,6 +8,7 @@ const crearCategoria = async (req, res = response) => {
   try {
     //verificar la categoria
     const categoria = await Categoria.findOne({ name });
+    //const ImgName = await Categoria.findOne({ img });
 
     if (categoria) {
       return res.status(400).json({
@@ -15,10 +16,17 @@ const crearCategoria = async (req, res = response) => {
         msg: "Esta categoria ya esta cargado en el sistema",
       });
     }
+    //console.log(ImgName);
+    /* if (ImgName) {
+      return res.status(400).json({
+        ok: false,
+        msg: "el nombre de la imagen ya esta en uso",
+      });
+    }*/
+
     //crear el categoria con el modelo
     const dbCategoria = new Categoria(req.body);
     console.log(dbCategoria);
-
     //crear categoria en BD
     await dbCategoria.save();
 
@@ -28,9 +36,11 @@ const crearCategoria = async (req, res = response) => {
       dbCategoria,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       ok: false,
-      msg: "Por favor hable con el administrador",
+      msg: "No se pudo crear la categoria",
+      error,
     });
   }
 };
@@ -55,6 +65,7 @@ const categoriaID = async (req, res = response) => {
 
     if (!categoria) {
       res.status(404).json({
+        ok: false,
         msg: "no existe la categoria",
       });
     }
@@ -76,7 +87,6 @@ const categoriaSugerida = async (req, res) => {
       name: { $regex: cat },
     });
 
-    console.log(cat, categorias);
     if (!categorias) {
       res.status(404).json({
         msg: "no existe la categoria",
@@ -121,8 +131,7 @@ const editarCategoria = async (req, res) => {
     console.log(error);
     return res.status(400).json({
       ok: false,
-      msg: "error",
-      error,
+      msg: "error al editar categoria",
     });
   }
 };
