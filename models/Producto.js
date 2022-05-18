@@ -15,11 +15,15 @@ const ProductoSchema = Schema({
   },
   stock: {
     type: Number,
-    require: true,
+    required: true,
   },
   categoria: {
     type: String,
-    require: true,
+    required: true,
+  },
+  img: {
+    type: String,
+    required: false,
   },
 });
 
