@@ -134,11 +134,30 @@ const editarCarrito = async (req, res = response) => {
       });
     }
 
-    console.log(usuario);
+    let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
+    //
+
+    if (index != -1) {
+      //TODO agregar que no supere al stock
+      usuario.carrito[index].unidades += carrito[0].unidades;
+      console.log("producto actualizado");
+      console.log(usuario);
+    } else {
+      console.log(usuario);
+      usuario.carrito.push(carrito[0]);
+      console.log(usuario, "usuario");
+    }
+
+    /*
+  usuario.carrito.map( producto =>{
+    if (producto._id == carrito[0]._id) {
+      producto.unidades = producto.unidades + carrito[0].unidades     
+    }
+    return producto
+  })  */
+
     //usuario.carrito = carrito;
     //usuario.carrito = usuario.carrito.concat(carrito);
-    usuario.carrito.push(carrito[0]);
-    console.log(usuario, "usuario");
 
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
