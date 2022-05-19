@@ -8,12 +8,13 @@ const crearUsuario = async (req, res = response) => {
   const { name, email, password } = req.body;
 
   try {
+    console.log(email, name, password);
     //verificar el email
     const UserEmail = await Usuario.findOne({ email });
-
+    console.log(UserEmail);
     //verificar usuario
     const UserName = await Usuario.findOne({ name });
-
+    console.log(UserName);
     if (UserEmail) {
       return res.status(400).json({
         ok: false,
@@ -29,6 +30,7 @@ const crearUsuario = async (req, res = response) => {
     }
     //crear el usuario con el modelo
     const dbUser = new Usuario(req.body);
+    console.log(dbUser);
 
     //Encriptar la contraseña
     const salt = bcrypt.genSaltSync();
@@ -117,10 +119,40 @@ const revalidarToken = async (req, res = response) => {
   });
 };
 
-const editarCarrito = async (req, res = response) => {};
+const editarCarrito = async (req, res = response) => {
+  console.log(req.body, "body");
+
+  const { carrito } = req.body;
+  console.log(carrito, " carrito");
+  try {
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        ok: false,
+        msg: "el usuario no existe",
+      });
+    }
+
+    console.log(usuario);
+    //usuario.carrito = carrito;
+    //usuario.carrito = usuario.carrito.concat(carrito);
+    usuario.carrito.push(carrito[0]);
+    console.log(usuario, "usuario");
+
+    usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error al editar carrito",
+    });
+  }
+};
 
 module.exports = {
   crearUsuario,
   loginUsuario,
   revalidarToken,
+  editarCarrito,
 };

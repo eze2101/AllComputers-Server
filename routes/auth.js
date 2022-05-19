@@ -4,6 +4,7 @@ const {
   crearUsuario,
   loginUsuario,
   revalidarToken,
+  editarCarrito,
 } = require("../controllers/User");
 const {
   crearProducto,
@@ -59,6 +60,9 @@ router.post(
 
 //Validar token
 router.get("/renew", validarJWT, revalidarToken);
+
+//editar carrito
+router.put("/carrito/:id", editarCarrito);
 
 //Crear Producto
 router.post(

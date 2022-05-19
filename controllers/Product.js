@@ -75,7 +75,6 @@ const sugerido = async (req, res) => {
       name: { $regex: product },
     });
 
-    console.log(product, productos);
     if (!productos) {
       res.status(404).json({
         msg: "no existe el producto",
@@ -99,7 +98,6 @@ const productosXcategoria = async (req, res) => {
       categoria: { $regex: pxc },
     });
 
-    console.log(pxc, prod);
     if (!prod) {
       res.status(404).json({
         msg: "no existe la categoria",
@@ -166,7 +164,6 @@ const eliminarProducto = async (req, res) => {
     await Producto.findOneAndRemove({ _id: req.params.id });
     res.json({ msg: "Producto eliminado con exito" });
   } catch (error) {
-    console.log(error);
     return res.status(400).json({
       ok: false,
       msg: "error",
