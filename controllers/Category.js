@@ -16,17 +16,10 @@ const crearCategoria = async (req, res = response) => {
         msg: "Esta categoria ya esta cargado en el sistema",
       });
     }
-    //console.log(ImgName);
-    /* if (ImgName) {
-      return res.status(400).json({
-        ok: false,
-        msg: "el nombre de la imagen ya esta en uso",
-      });
-    }*/
 
     //crear el categoria con el modelo
     const dbCategoria = new Categoria(req.body);
-    console.log(dbCategoria);
+
     //crear categoria en BD
     await dbCategoria.save();
 
@@ -36,7 +29,6 @@ const crearCategoria = async (req, res = response) => {
       dbCategoria,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "No se pudo crear la categoria",
@@ -122,13 +114,11 @@ const editarCategoria = async (req, res) => {
 
     categoria = await Categoria.findOneAndUpdate(
       { _id: req.params.id },
-      categoria,
-      { new: true }
+      categoria
     );
-    console.log(categoria);
+
     res.status(200).json({ ok: true, categoria: categoria });
   } catch (error) {
-    console.log(error);
     return res.status(400).json({
       ok: false,
       msg: "error al editar categoria",
@@ -150,7 +140,6 @@ const eliminarCategoria = async (req, res) => {
     await Categoria.findOneAndRemove({ _id: req.params.id });
     res.json({ msg: "Categoria eliminada con exito" });
   } catch (error) {
-    console.log(error);
     return res.status(400).json({
       ok: false,
       msg: "error",
