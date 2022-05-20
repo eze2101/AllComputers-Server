@@ -8,13 +8,12 @@ const crearUsuario = async (req, res = response) => {
   const { name, email, password } = req.body;
 
   try {
-    console.log(email, name, password);
     //verificar el email
     const UserEmail = await Usuario.findOne({ email });
-    console.log(UserEmail);
+
     //verificar usuario
     const UserName = await Usuario.findOne({ name });
-    console.log(UserName);
+
     if (UserEmail) {
       return res.status(400).json({
         ok: false,
@@ -30,7 +29,6 @@ const crearUsuario = async (req, res = response) => {
     }
     //crear el usuario con el modelo
     const dbUser = new Usuario(req.body);
-    console.log(dbUser);
 
     //Encriptar la contraseña
     const salt = bcrypt.genSaltSync();
@@ -94,7 +92,6 @@ const loginUsuario = async (req, res = response) => {
 
     //
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Por favor hable con el administrador",
@@ -120,10 +117,8 @@ const revalidarToken = async (req, res = response) => {
 };
 
 const agregarACarrito = async (req, res = response) => {
-  console.log(req.body, "body");
-
   const { carrito } = req.body;
-  console.log(carrito, " carrito");
+
   try {
     let usuario = await Usuario.findById(req.params.id);
 
@@ -139,12 +134,8 @@ const agregarACarrito = async (req, res = response) => {
     if (index != -1) {
       //TODO agregar que no supere al stock
       usuario.carrito[index].unidades += carrito[0].unidades;
-      console.log("producto actualizado");
-      console.log(usuario);
     } else {
-      console.log(usuario);
       usuario.carrito.push(carrito[0]);
-      console.log(usuario, "usuario");
     }
 
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
@@ -159,7 +150,7 @@ const agregarACarrito = async (req, res = response) => {
 
 const editarUnidadesCarrito = async (req, res = response) => {
   const { carrito } = req.body;
-  console.log(carrito);
+
   try {
     let usuario = await Usuario.findById(req.params.id);
 
@@ -169,10 +160,10 @@ const editarUnidadesCarrito = async (req, res = response) => {
         msg: "el usuario no existe",
       });
     }
-    console.log(usuario);
+
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
     usuario.carrito[index].unidades = carrito[0].unidades;
-    console.log(usuario);
+
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
   } catch (error) {
@@ -183,10 +174,37 @@ const editarUnidadesCarrito = async (req, res = response) => {
   }
 };
 
+const eliminarProdcutoCarrito = async (req, res = response) => {
+  try {
+    const { carrito } = req.body;
+
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        msg: "no existe el usuario",
+      });
+    }
+
+    let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
+    usuario.carrito.splice(index, 1);
+
+    usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error",
+      error,
+    });
+  }
+};
+
 module.exports = {
   crearUsuario,
   loginUsuario,
   revalidarToken,
   agregarACarrito,
   editarUnidadesCarrito,
+  eliminarProdcutoCarrito,
 };

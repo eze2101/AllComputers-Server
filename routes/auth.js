@@ -7,6 +7,7 @@ const {
   editarCarrito,
   agregarACarrito,
   editarUnidadesCarrito,
+  eliminarProdcutoCarrito,
 } = require("../controllers/User");
 const {
   crearProducto,
@@ -68,6 +69,9 @@ router.put("/carrito/:id", agregarACarrito);
 
 //editar unidades del carrito
 router.put("/carrito/unidades/:id", editarUnidadesCarrito);
+
+//eliminar producto del carrito
+router.put("/carrito/eliminar/:id", eliminarProdcutoCarrito);
 
 //Crear Producto
 router.post(
