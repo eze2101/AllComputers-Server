@@ -119,7 +119,7 @@ const revalidarToken = async (req, res = response) => {
   });
 };
 
-const editarCarrito = async (req, res = response) => {
+const agregarACarrito = async (req, res = response) => {
   console.log(req.body, "body");
 
   const { carrito } = req.body;
@@ -135,7 +135,6 @@ const editarCarrito = async (req, res = response) => {
     }
 
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
-    //
 
     if (index != -1) {
       //TODO agregar que no supere al stock
@@ -148,17 +147,32 @@ const editarCarrito = async (req, res = response) => {
       console.log(usuario, "usuario");
     }
 
-    /*
-  usuario.carrito.map( producto =>{
-    if (producto._id == carrito[0]._id) {
-      producto.unidades = producto.unidades + carrito[0].unidades     
+    usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error al editar carrito",
+    });
+  }
+};
+
+const editarUnidadesCarrito = async (req, res = response) => {
+  const { carrito } = req.body;
+  console.log(carrito);
+  try {
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        ok: false,
+        msg: "el usuario no existe",
+      });
     }
-    return producto
-  })  */
-
-    //usuario.carrito = carrito;
-    //usuario.carrito = usuario.carrito.concat(carrito);
-
+    console.log(usuario);
+    let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
+    usuario.carrito[index].unidades = carrito[0].unidades;
+    console.log(usuario);
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
   } catch (error) {
@@ -173,5 +187,6 @@ module.exports = {
   crearUsuario,
   loginUsuario,
   revalidarToken,
-  editarCarrito,
+  agregarACarrito,
+  editarUnidadesCarrito,
 };
