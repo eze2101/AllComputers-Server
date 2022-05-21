@@ -115,6 +115,7 @@ const revalidarToken = async (req, res = response) => {
     name: dbUser.name,
     email: dbUser.email,
     carrito: dbUser.carrito,
+    compras: dbUser.compras,
     roll: dbUser.roll,
     token,
   });
@@ -136,8 +137,6 @@ const agregarACarrito = async (req, res = response) => {
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
 
     if (index != -1) {
-      //TODO agregar que no supere al stock
-
       let producto = await Producto.findById(carrito[0]._id);
       console.log(producto);
 
@@ -241,6 +240,7 @@ const agregarCompra = async (req, res = response) => {
     };
 
     usuario.compras.push(COMPRA);
+    console.log(usuario);
 
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
@@ -254,7 +254,9 @@ const agregarCompra = async (req, res = response) => {
 
 const vaciarCarrito = async (req, res = response) => {
   try {
+    console.log("entro");
     let usuario = await Usuario.findById(req.params.id);
+    console.log(usuario.carrito);
 
     if (!usuario) {
       res.status(404).json({
@@ -262,7 +264,11 @@ const vaciarCarrito = async (req, res = response) => {
       });
     }
 
-    usuario.carrito = [];
+    const total = usuario.carrito.length;
+
+    console.log(total);
+    usuario.carrito.splice(0, total);
+    console.log(usuario.carrito);
 
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
@@ -276,8 +282,6 @@ const vaciarCarrito = async (req, res = response) => {
 };
 
 const procesarCompra = async (req, res = response) => {
-  const { carrito } = req.body;
-  console.log(carrito);
   try {
     let usuario = await Usuario.findById(req.params.id);
 
@@ -288,31 +292,36 @@ const procesarCompra = async (req, res = response) => {
       });
     }
 
+    let estados = await Promise.all(
+      usuario.carrito.map(async (prod) => {
+        let producto = await Producto.findById(prod._id);
+        if (prod.unidades > producto.stock) {
+          throw new Error(
+            "el stock de " +
+              producto.name.toString() +
+              " cambio, unidades disponibles actualmente: " +
+              producto.stock.toString()
+          );
+        }
+        //     console.log("paso");
+        return false;
+      })
+    );
+    //   console.log(estados);
     await usuario.carrito.forEach(async (prod) => {
-      let producto = await Producto.findById(prod._id);
-      if (prod.unidades > producto.stock) {
-        throw (
-          "el stock de " +
-          producto.name.toString() +
-          " cambio, unidades disponibles actualmente: " +
-          producto.stock.toString()
-        );
-      }
-      console.log("paso");
-    });
-    console.log("por empezar a restar");
-    usuario.carrito.forEach(async (prod) => {
-      let producto = await Producto.findById(prod._id);
-      producto.stock -= prod.unidades;
-      console.log("producto stock:", producto.stock);
-      await Producto.findByIdAndUpdate({ _id: prod._id }, producto);
+      let product = await Producto.findById(prod._id);
+      //      console.log(product);
+      product.stock -= prod.unidades;
+      //    console.log("producto stock:", product.stock);
+      await Producto.findByIdAndUpdate({ _id: prod._id }, product);
     });
 
     res.status(200).json({ ok: true, usuario });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({
       ok: false,
-      msg: "error al editar carrito",
+      msg: error.message,
     });
   }
 };
