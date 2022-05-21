@@ -15,11 +15,30 @@ const UsuarioSchema = Schema({
     type: String,
     required: true,
   },
+  roll: {
+    type: String,
+    required: false,
+  },
   carrito: [
     {
       IDproducto: String,
       unidades: Number,
       _id: String,
+    },
+  ],
+  compras: [
+    {
+      compra: [
+        {
+          IDproducto: String,
+          unidades: Number,
+          _id: String,
+        },
+      ],
+      fecha: {
+        type: Date,
+        default: Date.now(),
+      },
     },
   ],
 });

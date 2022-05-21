@@ -1,6 +1,7 @@
 const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const Usuario = require("../models/Usuario");
+const Producto = require("../models/Producto");
 const { generarJWT } = require("../helpers/jwt");
 const { model } = require("mongoose");
 
@@ -47,6 +48,7 @@ const crearUsuario = async (req, res = response) => {
       name,
       email,
       token,
+      roll: dbUser.roll,
     });
   } catch (error) {
     return res.status(500).json({
@@ -86,6 +88,7 @@ const loginUsuario = async (req, res = response) => {
       ok: true,
       uid: dbUser.id,
       name: dbUser.name,
+      roll: dbUser.roll,
       email,
       token,
     });
@@ -112,6 +115,7 @@ const revalidarToken = async (req, res = response) => {
     name: dbUser.name,
     email: dbUser.email,
     carrito: dbUser.carrito,
+    roll: dbUser.roll,
     token,
   });
 };
@@ -133,6 +137,25 @@ const agregarACarrito = async (req, res = response) => {
 
     if (index != -1) {
       //TODO agregar que no supere al stock
+
+      let producto = await Producto.findById(carrito[0]._id);
+      console.log(producto);
+
+      if (
+        usuario.carrito[index].unidades + carrito[0].unidades >
+        producto.stock
+      ) {
+        console.log("fallo");
+        let uniadesDisponibles =
+          producto.stock - usuario.carrito[index].unidades;
+        return res.status(404).json({
+          ok: false,
+          msg:
+            "Las unidades agregadas superan las unidades disponibles, puede comprar:" +
+            uniadesDisponibles.toString(),
+        });
+      }
+
       usuario.carrito[index].unidades += carrito[0].unidades;
     } else {
       usuario.carrito.push(carrito[0]);
@@ -200,6 +223,100 @@ const eliminarProdcutoCarrito = async (req, res = response) => {
   }
 };
 
+const agregarCompra = async (req, res = response) => {
+  const { carrito } = req.body;
+
+  try {
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        ok: false,
+        msg: "el usuario no existe",
+      });
+    }
+    const COMPRA = {
+      compra: carrito,
+      fecha: Date.now(),
+    };
+
+    usuario.compras.push(COMPRA);
+
+    usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error al editar carrito",
+    });
+  }
+};
+
+const vaciarCarrito = async (req, res = response) => {
+  try {
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        msg: "no existe el usuario",
+      });
+    }
+
+    usuario.carrito = [];
+
+    usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error",
+      error,
+    });
+  }
+};
+
+const procesarCompra = async (req, res = response) => {
+  const { carrito } = req.body;
+  console.log(carrito);
+  try {
+    let usuario = await Usuario.findById(req.params.id);
+
+    if (!usuario) {
+      res.status(404).json({
+        ok: false,
+        msg: "el usuario no existe",
+      });
+    }
+
+    await usuario.carrito.forEach(async (prod) => {
+      let producto = await Producto.findById(prod._id);
+      if (prod.unidades > producto.stock) {
+        throw (
+          "el stock de " +
+          producto.name.toString() +
+          " cambio, unidades disponibles actualmente: " +
+          producto.stock.toString()
+        );
+      }
+      console.log("paso");
+    });
+    console.log("por empezar a restar");
+    usuario.carrito.forEach(async (prod) => {
+      let producto = await Producto.findById(prod._id);
+      producto.stock -= prod.unidades;
+      console.log("producto stock:", producto.stock);
+      await Producto.findByIdAndUpdate({ _id: prod._id }, producto);
+    });
+
+    res.status(200).json({ ok: true, usuario });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: "error al editar carrito",
+    });
+  }
+};
+
 module.exports = {
   crearUsuario,
   loginUsuario,
@@ -207,4 +324,7 @@ module.exports = {
   agregarACarrito,
   editarUnidadesCarrito,
   eliminarProdcutoCarrito,
+  agregarCompra,
+  vaciarCarrito,
+  procesarCompra,
 };

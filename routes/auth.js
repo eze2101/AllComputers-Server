@@ -8,6 +8,9 @@ const {
   agregarACarrito,
   editarUnidadesCarrito,
   eliminarProdcutoCarrito,
+  agregarCompra,
+  vaciarCarrito,
+  procesarCompra,
 } = require("../controllers/User");
 const {
   crearProducto,
@@ -72,6 +75,15 @@ router.put("/carrito/unidades/:id", editarUnidadesCarrito);
 
 //eliminar producto del carrito
 router.put("/carrito/eliminar/:id", eliminarProdcutoCarrito);
+
+//agregar compra a Compras
+router.put("/compras/:id", agregarCompra);
+
+//vaciar carrito
+router.put("/carrito/vaciar/:id", vaciarCarrito);
+
+//comprar lo del carrito
+router.put("/carrito/comprar/:id", procesarCompra);
 
 //Crear Producto
 router.post(
