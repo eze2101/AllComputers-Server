@@ -39,6 +39,9 @@ const UsuarioSchema = Schema({
         type: Date,
         default: Date.now(),
       },
+      precio: {
+        type: Number,
+      },
     },
   ],
 });

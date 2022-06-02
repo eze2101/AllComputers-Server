@@ -121,25 +121,6 @@ const revalidarToken = async (req, res = response) => {
   });
 };
 
-const usuarioID = async (req, res = response) => {
-  try {
-    let usuario = await Usuario.findById(req.params.id);
-
-    if (!usuario) {
-      res.status(404).json({
-        msg: "no existe el usuario",
-      });
-    }
-
-    return res.json(usuario);
-  } catch (error) {
-    return res.status(400).json({
-      ok: false,
-      msg: "error",
-    });
-  }
-};
-
 const agregarACarrito = async (req, res = response) => {
   const { carrito } = req.body;
 
@@ -242,7 +223,7 @@ const eliminarProdcutoCarrito = async (req, res = response) => {
 };
 
 const agregarCompra = async (req, res = response) => {
-  const { carrito } = req.body;
+  const { precio, carrito } = req.body;
 
   try {
     let usuario = await Usuario.findById(req.params.id);
@@ -256,6 +237,7 @@ const agregarCompra = async (req, res = response) => {
     const COMPRA = {
       compra: carrito,
       fecha: Date.now(),
+      precio: precio,
     };
 
     usuario.compras.push(COMPRA);
@@ -349,7 +331,6 @@ module.exports = {
   crearUsuario,
   loginUsuario,
   revalidarToken,
-  usuarioID,
   agregarACarrito,
   editarUnidadesCarrito,
   eliminarProdcutoCarrito,
