@@ -24,6 +24,7 @@ const UsuarioSchema = Schema({
       IDproducto: String,
       unidades: Number,
       _id: String,
+      precio: Number,
     },
   ],
   compras: [
@@ -33,6 +34,7 @@ const UsuarioSchema = Schema({
           IDproducto: String,
           unidades: Number,
           _id: String,
+          precio: Number,
         },
       ],
       fecha: {

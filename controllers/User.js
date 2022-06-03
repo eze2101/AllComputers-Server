@@ -185,6 +185,7 @@ const editarUnidadesCarrito = async (req, res = response) => {
 
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
     usuario.carrito[index].unidades = carrito[0].unidades;
+    usuario.carrito[index].precio = carrito[0].precio;
 
     usuario = await Usuario.findByIdAndUpdate({ _id: req.params.id }, usuario);
     res.status(200).json({ ok: true, usuario });
