@@ -1,30 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { dbConecction } = require("./dataBase/config");
-require("dotenv").config();
 
-var fs = require("fs");
-var https = require("https");
+const { dbConecction } = require("./dataBase/config");
+const { join } = require("path");
+require("dotenv").config();
 
 //crear el servidor/aplicacion de express
 const app = express();
 
 //base de datos
 dbConecction();
-
-//https
-https
-  .createServer(
-    {
-      cert: fs.readFileSync("mi_certificado.crt"),
-      key: fs.readFileSync("mi_certificado.key"),
-    },
-    app
-  )
-  .listen(process.env.PORT, () => {
-    console.log(`servidor corriendo en puerto ${process.env.PORT}`);
-  });
 
 //Directorio public
 app.use(express.static(path.join(__dirname, "uploads")));
@@ -46,6 +32,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public/index.html"));
 });
 
-/*app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log(`servidor corriendo en puerto ${process.env.PORT}`);
-});*/
+});

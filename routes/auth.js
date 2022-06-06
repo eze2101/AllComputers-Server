@@ -33,6 +33,7 @@ const {
 } = require("../controllers/Category");
 const { validarCampos } = require("../middlewares/validar-campos");
 const { validarJWT } = require("../middlewares/validar-jwt");
+const { route } = require("express/lib/application");
 
 const router = Router();
 
