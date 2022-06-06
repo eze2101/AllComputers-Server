@@ -13,7 +13,7 @@ router.post("/upload", uploader, async (req, res) => {
     console.log(body.name);
     const newImage = new Image({
       fileName: body.name,
-      fileUrl: `http://localhost:4000/${file.filename}`,
+      fileUrl: `https://localhost:4000/${file.filename}`,
       _id: body.name,
     });
     console.log(newImage);
