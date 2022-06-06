@@ -14,6 +14,7 @@ const app = express();
 dbConecction();
 
 //https
+/*
 https
   .createServer(
     {
@@ -24,7 +25,7 @@ https
   )
   .listen(process.env.PORT, () => {
     console.log(`servidor corriendo en puerto ${process.env.PORT}`);
-  });
+  });*/
 
 //Directorio public
 app.use(express.static(path.join(__dirname, "uploads")));
@@ -46,6 +47,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public/index.html"));
 });
 
-/*app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log(`servidor corriendo en puerto ${process.env.PORT}`);
-});*/
+});
