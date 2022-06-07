@@ -18,7 +18,7 @@ router.post("/upload", uploader, async (req, res) => {
     });
     console.log(newImage);
     await newImage.save();
-    res.json({
+    return res.json({
       newImage,
     });
   }
