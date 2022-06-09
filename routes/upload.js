@@ -2,6 +2,14 @@ const router = require("express").Router();
 const Image = require("../models/image");
 const storage = require("../multer/multer");
 const multer = require("multer");
+const cloudinary = require("cloudinary");
+const fs = require("fs-extra");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const uploader = multer({
   storage,
@@ -9,16 +17,35 @@ const uploader = multer({
 
 router.post("/upload", uploader, async (req, res) => {
   const { body, file } = req;
-  if (file && body) {
-    console.log(body.name);
+
+  let image = await Image.findById(req.body.name);
+
+  if (image) {
+    await cloudinary.v2.uploader.destroy(image.public_id);
+    const result = await cloudinary.v2.uploader.upload(file.path);
+    image.fileUrl = result.secure_url;
+    image.public_id = result.public_id;
+
+    image = await Image.findOneAndUpdate({ _id: req.body.name }, image, {
+      new: true,
+    });
+    await fs.unlink(file.path);
+    res.status(200).json({ ok: true, image });
+  } else {
+    console.log(file);
+    const result = await cloudinary.v2.uploader.upload(file.path);
     const newImage = new Image({
       fileName: body.name,
-      fileUrl: `https://all-computers.vercel.app/${file.filename}`,
+      fileUrl: result.secure_url,
       _id: body.name,
+      public_id: result.public_id,
     });
     console.log(newImage);
     await newImage.save();
-    return res.json({
+
+    await fs.unlink(file.path);
+
+    res.json({
       newImage,
     });
   }
