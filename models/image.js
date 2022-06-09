@@ -6,6 +6,7 @@ const Image = new Schema({
   fileUrl: { type: String },
   uploadDate: { type: Date, default: Date.now() },
   _id: { type: String },
+  public_id: { type: String, required: false },
 });
 
 module.exports = mongoose.model("Image", Image);
