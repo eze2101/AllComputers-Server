@@ -18,36 +18,43 @@ const uploader = multer({
 router.post("/upload", uploader, async (req, res) => {
   const { body, file } = req;
 
-  let image = await Image.findById(req.body.name);
+  console.log("body", body);
+  console.log("file", file);
 
-  if (image) {
-    await cloudinary.v2.uploader.destroy(image.public_id);
-    const result = await cloudinary.v2.uploader.upload(file.path);
-    image.fileUrl = result.secure_url;
-    image.public_id = result.public_id;
+  try {
+    let image = await Image.findById(req.body.name);
 
-    image = await Image.findOneAndUpdate({ _id: req.body.name }, image, {
-      new: true,
-    });
-    await fs.unlink(file.path);
-    res.status(200).json({ ok: true, image });
-  } else {
-    console.log(file);
-    const result = await cloudinary.v2.uploader.upload(file.path);
-    const newImage = new Image({
-      fileName: body.name,
-      fileUrl: result.secure_url,
-      _id: body.name,
-      public_id: result.public_id,
-    });
-    console.log(newImage);
-    await newImage.save();
+    if (image) {
+      await cloudinary.v2.uploader.destroy(image.public_id);
+      const result = await cloudinary.v2.uploader.upload(file.path);
+      image.fileUrl = result.secure_url;
+      image.public_id = result.public_id;
 
-    await fs.unlink(file.path);
+      image = await Image.findOneAndUpdate({ _id: req.body.name }, image, {
+        new: true,
+      });
+      //await fs.unlink(file.path);
+      return res.status(200).json({ ok: true, image });
+    } else {
+      console.log(file);
+      const result = await cloudinary.v2.uploader.upload(file.path);
+      const newImage = new Image({
+        fileName: body.name,
+        fileUrl: result.secure_url,
+        _id: body.name,
+        public_id: result.public_id,
+      });
+      console.log(newImage);
+      await newImage.save();
 
-    res.json({
-      newImage,
-    });
+      //await fs.unlink(file.path);
+
+      return res.json({
+        newImage,
+      });
+    }
+  } catch (error) {
+    return res.status(400).json("no funciona");
   }
 });
 

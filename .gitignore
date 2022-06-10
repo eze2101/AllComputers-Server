@@ -1,2 +1,5 @@
-node_modules/
+#ignorar carpeta
+node_modules
+
+#ignorar datos sensibles
 .env
