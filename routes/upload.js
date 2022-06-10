@@ -4,7 +4,6 @@ const storage = require("../multer/multer");
 const multer = require("multer");
 const cloudinary = require("cloudinary");
 const fs = require("fs-extra");
-const logger = require("../logger");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -19,8 +18,8 @@ const uploader = multer({
 router.post("/upload", uploader, async (req, res) => {
   const { body, file } = req;
 
-  logger.info("body", body);
-  logger.info("file", file);
+  console.log("body", body);
+  console.log("file", file);
 
   try {
     let image = await Image.findById(req.body.name);
