@@ -4,8 +4,8 @@ const path = require("path");
 const { dbConecction } = require("./dataBase/config");
 
 if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
 }
+require("dotenv").config();
 
 var fs = require("fs");
 var https = require("https");
