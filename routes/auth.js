@@ -1,18 +1,17 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
+const { validarCampos } = require("../middlewares/validar-campos");
+const { validarJWT } = require("../middlewares/validar-jwt");
 const {
   crearUsuario,
   loginUsuario,
   revalidarToken,
-  editarCarrito,
   agregarACarrito,
   editarUnidadesCarrito,
   eliminarProdcutoCarrito,
   agregarCompra,
   vaciarCarrito,
   procesarCompra,
-  usuarioID,
-  verUsuario,
 } = require("../controllers/User");
 const {
   crearProducto,
@@ -31,9 +30,6 @@ const {
   eliminarCategoria,
   categoriaID,
 } = require("../controllers/Category");
-const { validarCampos } = require("../middlewares/validar-campos");
-const { validarJWT } = require("../middlewares/validar-jwt");
-const { route } = require("express/lib/application");
 
 const router = Router();
 

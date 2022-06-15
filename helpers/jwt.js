@@ -13,11 +13,9 @@ const generarJWT = (uid, name) => {
       },
       (err, token) => {
         if (err) {
-          //TODO MAL
           console.log(err);
           reject(err);
         } else {
-          //TODO BIEN
           resolve(token);
         }
       }

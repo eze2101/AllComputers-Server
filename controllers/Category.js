@@ -3,12 +3,12 @@ const Categoria = require("../models/Categoria");
 
 //crear categorias
 const crearCategoria = async (req, res = response) => {
+  req.body.name = req.body.name.toLowerCase();
   const { name } = req.body;
 
   try {
     //verificar la categoria
     const categoria = await Categoria.findOne({ name });
-    //const ImgName = await Categoria.findOne({ img });
 
     if (categoria) {
       return res.status(400).json({
@@ -61,7 +61,6 @@ const categoriaID = async (req, res = response) => {
         msg: "no existe la categoria",
       });
     }
-
     return res.json(categoria);
   } catch (error) {
     return res.status(400).json({
@@ -84,7 +83,6 @@ const categoriaSugerida = async (req, res) => {
         msg: "no existe la categoria",
       });
     }
-
     return res.json(categorias);
   } catch (error) {
     return res.status(400).json({
@@ -111,12 +109,10 @@ const editarCategoria = async (req, res) => {
 
     categoria.name = name;
     categoria.img = img;
-
     categoria = await Categoria.findOneAndUpdate(
       { _id: req.params.id },
       categoria
     );
-
     res.status(200).json({ ok: true, categoria: categoria });
   } catch (error) {
     return res.status(400).json({

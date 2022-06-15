@@ -3,6 +3,7 @@ const Producto = require("../models/Producto");
 
 //crear producto
 const crearProducto = async (req, res = response) => {
+  req.body.name = req.body.name.toLowerCase();
   const { name } = req.body;
 
   try {
@@ -17,7 +18,6 @@ const crearProducto = async (req, res = response) => {
     }
     //crear el producto con el modelo
     const dbProduct = new Producto(req.body);
-
     //crear producto en BD
     await dbProduct.save();
 
@@ -47,7 +47,7 @@ const verProductos = async (req, res = response) => {
   }
 };
 
-//ver producto id
+//ver producto por id
 const productoID = async (req, res = response) => {
   try {
     let producto = await Producto.findById(req.params.id);

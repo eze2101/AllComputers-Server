@@ -3,12 +3,7 @@ const cors = require("cors");
 const path = require("path");
 const { dbConecction } = require("./dataBase/config");
 
-if (process.env.NODE_ENV !== "production") {
-}
 require("dotenv").config();
-
-var fs = require("fs");
-var https = require("https");
 
 //crear el servidor/aplicacion de express
 const app = express();
@@ -25,8 +20,7 @@ app.use(cors());
 
 //Lectura y parseo del body
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-//true
+app.use(express.urlencoded({ extended: true }));
 
 //Rutas
 app.use("/api/home", require("./routes/auth"));

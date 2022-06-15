@@ -47,26 +47,5 @@ const UsuarioSchema = Schema({
     },
   ],
 });
-/*
-carrito: [
-  {
-    producto: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Productos",
-    },
-  },
-],
 
-const productosCarritoSchema = Schema({
-  idProducto: {
-    type: String,
-    required: false,
-  },
-  unidades: {
-    type: Number,
-    required: false,
-  },
-});
-*/
 module.exports = model("Usuario", UsuarioSchema);
-//module.exports = model("Productos", productosCarritoSchema);

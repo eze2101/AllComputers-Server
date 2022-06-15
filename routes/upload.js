@@ -33,7 +33,7 @@ router.post("/upload", uploader, async (req, res) => {
       image = await Image.findOneAndUpdate({ _id: req.body.name }, image, {
         new: true,
       });
-      //await fs.unlink(file.path);
+      await fs.unlink(file.path);
       return res.status(200).json({ ok: true, image });
     } else {
       console.log(file);
@@ -46,8 +46,7 @@ router.post("/upload", uploader, async (req, res) => {
       });
       console.log(newImage);
       await newImage.save();
-
-      //await fs.unlink(file.path);
+      await fs.unlink(file.path);
 
       return res.json({
         newImage,

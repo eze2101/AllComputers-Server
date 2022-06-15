@@ -92,8 +92,6 @@ const loginUsuario = async (req, res = response) => {
       email,
       token,
     });
-
-    //
   } catch (error) {
     return res.status(500).json({
       ok: false,
@@ -104,7 +102,6 @@ const loginUsuario = async (req, res = response) => {
 
 const revalidarToken = async (req, res = response) => {
   const { uid } = req;
-  //leer la base de datos
   const dbUser = await Usuario.findById(uid);
 
   const token = await generarJWT(uid, dbUser.name);
@@ -127,15 +124,8 @@ const agregarACarrito = async (req, res = response) => {
   try {
     let usuario = await Usuario.findById(req.params.id);
 
-    if (!usuario) {
-      res.status(404).json({
-        ok: false,
-        msg: "el usuario no existe",
-      });
-    }
-
+    //comprar si el producto ya existe en carrito
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
-
     if (index != -1) {
       let producto = await Producto.findById(carrito[0]._id);
       console.log(producto);
@@ -144,7 +134,6 @@ const agregarACarrito = async (req, res = response) => {
         usuario.carrito[index].unidades + carrito[0].unidades >
         producto.stock
       ) {
-        console.log("fallo");
         let uniadesDisponibles =
           producto.stock - usuario.carrito[index].unidades;
         return res.status(404).json({
@@ -176,13 +165,6 @@ const editarUnidadesCarrito = async (req, res = response) => {
   try {
     let usuario = await Usuario.findById(req.params.id);
 
-    if (!usuario) {
-      res.status(404).json({
-        ok: false,
-        msg: "el usuario no existe",
-      });
-    }
-
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
     usuario.carrito[index].unidades = carrito[0].unidades;
     usuario.carrito[index].precio = carrito[0].precio;
@@ -202,12 +184,6 @@ const eliminarProdcutoCarrito = async (req, res = response) => {
     const { carrito } = req.body;
 
     let usuario = await Usuario.findById(req.params.id);
-
-    if (!usuario) {
-      res.status(404).json({
-        msg: "no existe el usuario",
-      });
-    }
 
     let index = usuario.carrito.findIndex((el) => el._id == carrito[0]._id);
     usuario.carrito.splice(index, 1);
@@ -229,12 +205,6 @@ const agregarCompra = async (req, res = response) => {
   try {
     let usuario = await Usuario.findById(req.params.id);
 
-    if (!usuario) {
-      res.status(404).json({
-        ok: false,
-        msg: "el usuario no existe",
-      });
-    }
     const COMPRA = {
       compra: carrito,
       fecha: Date.now(),
@@ -260,12 +230,6 @@ const vaciarCarrito = async (req, res = response) => {
     let usuario = await Usuario.findById(req.params.id);
     console.log(usuario.carrito);
 
-    if (!usuario) {
-      res.status(404).json({
-        msg: "no existe el usuario",
-      });
-    }
-
     const total = usuario.carrito.length;
 
     console.log(total);
@@ -287,13 +251,6 @@ const procesarCompra = async (req, res = response) => {
   try {
     let usuario = await Usuario.findById(req.params.id);
 
-    if (!usuario) {
-      res.status(404).json({
-        ok: false,
-        msg: "el usuario no existe",
-      });
-    }
-
     let estados = await Promise.all(
       usuario.carrito.map(async (prod) => {
         let producto = await Producto.findById(prod._id);
@@ -301,20 +258,18 @@ const procesarCompra = async (req, res = response) => {
           throw new Error(
             "el stock de " +
               producto.name.toString() +
-              " cambio, unidades disponibles actualmente: " +
+              " cambió, unidades disponibles actualmente: " +
               producto.stock.toString()
           );
         }
-        //     console.log("paso");
+
         return false;
       })
     );
-    //   console.log(estados);
+
     await usuario.carrito.forEach(async (prod) => {
       let product = await Producto.findById(prod._id);
-      //      console.log(product);
       product.stock -= prod.unidades;
-      //    console.log("producto stock:", product.stock);
       await Producto.findByIdAndUpdate({ _id: prod._id }, product);
     });
 
